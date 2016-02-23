@@ -13,15 +13,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by Guillermo on 11-Feb-16.
@@ -87,12 +98,92 @@ public class ForecastFragment extends Fragment
         return rootView;
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, Void>
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
     {
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
+        private String getReadableDateString(long time)
+        {
+            // Because the API returns a unix timestamp (measured in seconds), it must be converted to valid date.
+            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
+            return shortenedDateFormat.format(time);
+        }
+
+        //Prepare weather high/lows for presentation.
+        private String formatHighLows(double high, double low)
+        {
+            long roundedHigh = Math.round(high);
+            long roundedLow = Math.round(low);
+
+            String highLowStr = roundedHigh + "/" + roundedLow;
+            return highLowStr;
+        }
+
+        //Take the String representing the complete forecast in JSON Format and pull out the data we need.
+        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays) throws JSONException
+        {
+            //JSON objects that need to be extracted.
+            final String OWM_LIST = "list";
+            final String OWM_WEATHER = "weather";
+            final String OWM_TEMPERATURE = "main";
+            final String OWM_MAX = "temp_max";
+            final String OWM_MIN = "temp_min";
+            final String OWM_DESCRIPTION = "main";
+
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
+            // OWM returns daily forecasts based upon the local time of the city that is being
+            // asked for, which means that we need to know the GMT offset to translate this data
+            // properly.
+
+            // Since this data is also sent in-order and the first day is always the
+            // current day, we're going to take advantage of that to get a nice
+            // normalized UTC date for all of our weather.
+
+            //Get local current date and time
+            GregorianCalendar calendar = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
+
+            //Declare String array to store results
+            // Each position of the array represent a day forecast
+            String[] resultStrs = new String[numDays];
+
+            for (int i = 0; i < weatherArray.length(); i++)
+            {
+                //For now the format will be: day - description - high/low
+                String day;
+                String description;
+                String highAndLow;
+
+                //Get JSON object for day i
+                JSONObject dayForecast = weatherArray.getJSONObject(i);
+
+                //Get day i
+                long dateTime = calendar.getTimeInMillis();
+                day = getReadableDateString(dateTime);
+                calendar.add(Calendar.DATE, 1);
+
+                //Get description for day i
+                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
+                description = weatherObject.getString(OWM_DESCRIPTION);
+
+                //Get max and min temperature for day i
+                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+                double high = temperatureObject.getDouble(OWM_MAX);
+                double low = temperatureObject.getDouble(OWM_MIN);
+
+                //Build String to display high and low temperature
+                highAndLow = formatHighLows(high, low);
+
+                //Build String result with previously said format
+                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+            }
+
+            return resultStrs;
+        }
+
         @Override
-        protected Void doInBackground(String... params)
+        protected String[] doInBackground(String... params)
         {
             //Verify that there's params to use
             if (params.length == 0)
@@ -114,7 +205,7 @@ public class ForecastFragment extends Fragment
             try
             {
                 //Declare the URL parameters for the OpenWeatherMap query
-                final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
+                final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast?";
                 final String QUERY_PARAM = "q";
                 final String FORMAT_PARAM = "mode";
                 final String UNITS_PARAM = "units";
@@ -163,8 +254,6 @@ public class ForecastFragment extends Fragment
                 }
 
                 forecastJSONStr = buffer.toString();
-
-                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJSONStr);
             }
             catch (IOException e)
             {
@@ -190,7 +279,31 @@ public class ForecastFragment extends Fragment
                     }
                 }
             }
+
+            try
+            {
+                return getWeatherDataFromJson(forecastJSONStr, numDays);
+            }
+            catch (JSONException e)
+            {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result)
+        {
+            if (result != null)
+            {
+                forecastArrayAdapter.clear();
+                for (String dayForecastStr : result)
+                {
+                    forecastArrayAdapter.addAll(dayForecastStr);
+                }
+            }
         }
     }
 }
