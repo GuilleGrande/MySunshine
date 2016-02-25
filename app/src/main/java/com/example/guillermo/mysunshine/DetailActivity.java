@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 
 public class DetailActivity extends AppCompatActivity
 {
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -29,7 +28,7 @@ public class DetailActivity extends AppCompatActivity
         {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new DetailActivityFragment())
                     .commit();
         }
     }
@@ -57,17 +56,5 @@ public class DetailActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public static class PlaceholderFragment extends Fragment
-    {
-        public PlaceholderFragment() {}
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-            return rootView;
-        }
     }
 }
