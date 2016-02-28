@@ -1,7 +1,9 @@
 package com.example.guillermo.mysunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -54,6 +56,13 @@ public class ForecastFragment extends Fragment
     }
 
     @Override
+    public void onStart()
+    {
+        super.onStart();
+        updateWeather();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.forecast_fragment, menu);
@@ -66,8 +75,7 @@ public class ForecastFragment extends Fragment
 
         if (id == R.id.action_refresh)
         {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("Caracas,ve");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -76,37 +84,25 @@ public class ForecastFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        //String array of dummy content for listView
-        String[] forecastArray = {"Today - Sunny - 88/63",
-                                  "Tomorrow - Foggy - 70/40",
-                                  "Wednesday - Meatballs - 80/56",
-                                  "Thursday - Thunderstorm - 85/60",
-                                  "Friday - Cloudy - 72/63",
-                                  "Saturday - Sunny - 85/60",
-                                  "Sunday - Hail - 88/63"};
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
-
         //Array adapter constructor
         forecastArrayAdapter = new ArrayAdapter<String>(getActivity(),                   //current context
                                                         R.layout.list_item_forecast,     //id of list item layout
                                                         R.id.txtView_list_item_forecast, //id of the textView to populate
-                                                        weekForecast);                   //forecast data
+                                                        new ArrayList<String>());        //forecast data
 
         View rootView = inflater.inflate(R.layout.content_main, container, false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.listView_forecast);
         listView.setAdapter(forecastArrayAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 String intentStrForecast = forecastArrayAdapter.getItem(position);
 
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
-                                    .putExtra(Intent.EXTRA_TEXT, intentStrForecast);
+                        .putExtra(Intent.EXTRA_TEXT, intentStrForecast);
                 startActivity(intent);
                 Toast.makeText(getActivity(), intentStrForecast, Toast.LENGTH_SHORT).show();
             }
@@ -129,6 +125,22 @@ public class ForecastFragment extends Fragment
         //Prepare weather high/lows for presentation.
         private String formatHighLows(double high, double low)
         {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPreferences.getString
+                                                (getString(R.string.pref_units_key)
+                                                ,getString(R.string.label_pref_units_metric));
+
+            //Converts units depending on user preference
+            if (unitType.equals(getString(R.string.pref_units_imperial)))
+            {
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            }
+            else  if (!unitType.equals(getString(R.string.pref_units_metric)))
+            {
+                Log.d(LOG_TAG, "Unit type not found: " + unitType);
+            }
+
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
@@ -322,5 +334,16 @@ public class ForecastFragment extends Fragment
                 }
             }
         }
+    }
+
+    /**
+     * Method used to update weather date by calling the FetchWeatherTask.class
+     */
+    public void updateWeather()
+    {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = preferences.getString(getString(R.string.pref_loaction_key), getString(R.string.pref_loaction_default));
+        weatherTask.execute(location);
     }
 }
