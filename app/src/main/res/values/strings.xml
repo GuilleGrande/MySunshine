@@ -1,6 +1,34 @@
 <resources>
     <string name="app_name">MySunshine</string>
+
+            <!-- LABELS FOR ACTION BAR OPTIONS -->
+
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
+
+            <!-- LABELS FOR ACTIVITIES TITLES -->
+
     <string name="title_activity_detail">Details</string>
+    <string name="title_activity_settings">Settings</string>
+
+            <!-- LABELS FOR ACTIVITY SETTINGS -->
+
+    <!-- Labels for the different preferences -->
+    <string name="pref_loaction_label">Location</string>
+    <string name="pref_units_label">Temperature Units</string>
+
+    <!-- Key names for storing preference values in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_loaction_key">location</string>
+    <string name="pref_units_key">units</string>
+
+    <!-- Default values for the preferences -->
+    <string name="pref_loaction_default">Caracas,ve</string>
+
+    <!-- Labels for temperature unit preferences -->
+    <string name="label_pref_units_metric">Metric</string>
+    <string name="label_pref_units_imperial">Imperial</string>
+
+    <!-- Values for temperature units -->
+    <string name="pref_units_metric">metric</string>
+    <string name="pref_units_imperial">imperial</string>
 </resources>
