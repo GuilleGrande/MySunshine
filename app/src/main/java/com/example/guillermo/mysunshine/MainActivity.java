@@ -16,6 +16,10 @@ public class MainActivity extends AppCompatActivity
 {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    //**********************************************************************************************
+    //                                    ACITVITY LIFECYCLE                                       *
+    // *********************************************************************************************
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -31,7 +35,43 @@ public class MainActivity extends AppCompatActivity
                     .add(R.id.container, new ForecastFragment())
                     .commit();
         }
+
+        Log.d(LOG_TAG, "CREATE");
     }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        Log.d(LOG_TAG, "DESTROY");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(LOG_TAG, "START");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "STOP");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(LOG_TAG, "PAUSE");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG, "RESUME");
+    }
+
+    //**********************************************************************************************
+    //**********************************************************************************************
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
