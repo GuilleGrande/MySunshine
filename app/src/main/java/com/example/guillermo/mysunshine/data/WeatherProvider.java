@@ -284,7 +284,7 @@ public class WeatherProvider extends ContentProvider
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
 
-        if (null != selection)
+        if (null == selection)
         {
             selection = "1";
         }
