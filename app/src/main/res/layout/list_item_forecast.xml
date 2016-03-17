@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:text="Tomorrow"/>
         <TextView
-            android:id="@+id/list_item_weather_txtView"
+            android:id="@+id/list_item_forecast_txtView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Clear"/>
