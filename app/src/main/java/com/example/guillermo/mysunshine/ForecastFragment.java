@@ -75,13 +75,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onStart()
-    {
-        super.onStart();
-        updateWeather();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         int id = item.getItemId();
@@ -136,6 +129,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onActivityCreated(savedInstanceState);
     }
 
+    public void onLocationChanged()
+    {
+        updateWeather();
+        getLoaderManager().restartLoader(FORECAST_LOADER,null, this);
+    }
+
     /**
      * Method used to update weather date by calling {@link FetchWeatherTask}
      */
@@ -153,7 +152,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         // Sort order:  Ascending, by date.
         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationSetting, System.currentTimeMillis());
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry
+                                        .buildWeatherLocationWithStartDate(locationSetting, System.currentTimeMillis());
 
         return new CursorLoader(getActivity(),
                                 weatherForLocationUri,

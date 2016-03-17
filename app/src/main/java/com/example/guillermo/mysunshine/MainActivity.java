@@ -11,14 +11,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
 public class MainActivity extends AppCompatActivity
 {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-
-    //**********************************************************************************************
-    //                                    ACITVITY LIFECYCLE                                       *
-    // *********************************************************************************************
+    private String currentLocation;
+    private final String FORECASTFRAGMENT_TAG = "FF_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -28,11 +25,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        currentLocation = Utility.getPreferredLocation(this);
+
         if (savedInstanceState == null)
         {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
+                    .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
                     .commit();
         }
 
@@ -65,13 +64,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onResume()
+    {
         Log.d(LOG_TAG, "RESUME");
-    }
+        super.onResume();
 
-    //**********************************************************************************************
-    //**********************************************************************************************
+        String location = Utility.getPreferredLocation(this);
+
+        if (location != null && !location.equals(currentLocation))
+        {
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+
+            if (forecastFragment != null)
+            {
+                forecastFragment.onLocationChanged();
+            }
+            currentLocation = location;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -84,9 +94,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (id == R.id.action_settings)
@@ -103,7 +110,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
      * This method fetchs user's preferred location to open
      * in an external map app
@@ -111,11 +117,14 @@ public class MainActivity extends AppCompatActivity
     public void openPreferredLocationInMap()
     {
         //Get user's preferred location and store it a String variable
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String location = sharedPreferences.getString(getString(R.string.pref_loaction_key), getString(R.string.pref_loaction_default));
+        String location = Utility.getPreferredLocation(this);
 
         // Build URI scheme with previous String to launch an intent
-        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("q", location).build();
+        Uri geoLocation = Uri
+                .parse("geo:0,0?")
+                .buildUpon()
+                .appendQueryParameter("q", location)
+                .build();
 
         //Build intent to launch external map app
         Intent intent = new Intent(Intent.ACTION_VIEW);
