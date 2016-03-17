@@ -1,10 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/txtView_list_item_forecast"
-    android:layout_width="match_parent"
+<LinearLayout
     android:layout_height="wrap_content"
+    android:layout_width="match_parent"
     android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:text="Today - Sunny - 24º">
-</TextView>
+    android:padding="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/list_item_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_launcher"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/list_item_date_txtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tomorrow"/>
+        <TextView
+            android:id="@+id/list_item_weather_txtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/list_item_highTemp_txtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="21ºC" />
+        <TextView
+            android:id="@+id/list_item_lowTemp_txtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8ºC" />
+
+    </LinearLayout>
+
+</LinearLayout>
