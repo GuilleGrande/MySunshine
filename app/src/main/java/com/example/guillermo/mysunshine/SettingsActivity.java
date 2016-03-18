@@ -20,7 +20,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         addPreferencesFromResource(R.xml.pref_general);
 
         //Bind preferences so the UI summary can be updated when the preference changes.
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_loaction_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
     }
 
