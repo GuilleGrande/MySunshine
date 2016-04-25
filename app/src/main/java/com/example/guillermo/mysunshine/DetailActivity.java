@@ -2,6 +2,7 @@ package com.example.guillermo.mysunshine;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,16 +15,24 @@ public class DetailActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        if (savedInstanceState != null)
+        if (savedInstanceState == null)
         {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
+
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailActivityFragment.DETAIL_URI, getIntent().getData());
+
+            DetailActivityFragment fragment = new DetailActivityFragment();
+            fragment.setArguments(arguments);
+
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new DetailActivityFragment())
+                    .add(R.id.weather_detail_container, fragment)
                     .commit();
         }
     }

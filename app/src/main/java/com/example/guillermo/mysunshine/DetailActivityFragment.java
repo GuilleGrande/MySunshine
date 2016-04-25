@@ -2,6 +2,7 @@ package com.example.guillermo.mysunshine;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -25,11 +26,15 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 {
     private final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
     private final String FORECAST_SHARE_HASHTAG = " #MySunshineApp";
+    static final String DETAIL_URI = "URI";
+
+    private Uri mUri;
     private String mForecast;
-    private ShareActionProvider shareActionProvider;
+    private ShareActionProvider mShareActionProvider;
 
     //Loader id constant
     private static final int DETAIL_LOADER = 0;
+
     //Projection of the columns we need from the data base
     private static final String[] FORECAST_COLUMNS = {WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
                                                             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -74,6 +79,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Bundle args = getArguments();
+
+        if (args != null)
+        {
+            mUri = args.getParcelable(DetailActivityFragment.DETAIL_URI);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         mDetail_icon = (ImageView) rootView.findViewById(R.id.detail_icon);
@@ -98,11 +110,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         MenuItem menuItem = menu.findItem(R.id.action_share);
 
         //Get provider and hold onto it to set/change the share intent
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
         if (mForecast != null)
         {
-            shareActionProvider.setShareIntent(createShareForecastIntent());
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
         }
     }
 
@@ -126,22 +138,21 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
         Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
 
-        if (intent == null)
+        if (null != mUri)
         {
-            //If there is no projection data in the intent there is no point in returning a loader.
-            return null;
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+
+            return new CursorLoader(getActivity(),
+                                    mUri,
+                                    FORECAST_COLUMNS,
+                                    null,
+                                    null,
+                                    null);
         }
 
-        // Now we create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(getActivity(),
-                                intent.getData(),
-                                FORECAST_COLUMNS,
-                                null,
-                                null,
-                                null);
+        return null;
     }
 
     @Override
@@ -195,13 +206,27 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
             mForecast = String.format("%s - %s - %s/%s", dateTxt, forecastTxt, high, low);
 
-            if (shareActionProvider != null)
+            if (mShareActionProvider != null)
             {
-                shareActionProvider.setShareIntent(createShareForecastIntent());
+                mShareActionProvider.setShareIntent(createShareForecastIntent());
             }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
+
+    void onLocationChanged(String newLocation)
+    {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+
+        if (null != uri)
+        {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
+    }
 }
