@@ -14,15 +14,22 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="56dp"
             android:orientation="vertical">
 
             <!-- Header: Day, Date -->
             <TextView
+                android:fontFamily="sans-serif-condensed"
                 android:layout_width="wrap_content"
+                android:minWidth="120dp"
+                android:textSize="24sp"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_day_txtView"/>
 
             <TextView
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="20sp"
+                android:textColor="@color/grey_700"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_date_txtView"/>
@@ -37,27 +44,41 @@
             android:orientation="vertical">
 
             <TextView
+                android:fontFamily="sans-serif-light"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="96sp"
                 android:id="@+id/detail_high_txtView"/>
 
             <TextView
+                android:layout_marginLeft="8dp"
+                android:textSize="48sp"
+                android:textColor="@color/grey_700"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_low_txtView"/>
 
             <!-- Humidity, wind, pressure -->
             <TextView
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_humidity_txtView"/>
 
             <TextView
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_pressure_txtView"/>
 
             <TextView
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_wind_txtView"/>
@@ -76,6 +97,9 @@
                 android:id="@+id/detail_icon"/>
 
             <TextView
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@color/grey_700"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_forecast_txtView"/>
