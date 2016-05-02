@@ -23,9 +23,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     {
         super.onCreate(savedInstanceState);
 
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-
         mLocation = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
 
@@ -52,7 +49,11 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         else
         {
             mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
+
+        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast));
+        forecastFragment.setUseTodayLayout(!mTwoPane);
 
         Log.d(LOG_TAG, "CREATE");
     }
