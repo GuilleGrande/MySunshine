@@ -3,7 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.guillermo.mysunshine">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <!-- PERMISSION FOR APP'S NETWORK ACCESS -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- PERMISSIONS FOR THE SYNC ADAPTER -->
+
+    <uses-permission
+        android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"
@@ -46,9 +56,35 @@
         </activity>
         
         <provider
-            android:authorities="com.example.guillermo.mysunshine.app"
-            android:name=".data.WeatherProvider">
+            android:authorities="@string/content_authority"
+            android:name=".data.WeatherProvider"
+            android:exported="false"
+            android:syncable="true">
         </provider>
+
+        <!-- SYNCADAPTER'S DUMMY AUTHNETICATION SERVICE -->
+        <service android:name=".sync.MySunshineAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator"/>
+        </service>
+
+        <!-- SYNCADAPTER SERVICE -->
+        <service
+            android:name=".sync.MySunshineSyncService"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
 
     </application>
 

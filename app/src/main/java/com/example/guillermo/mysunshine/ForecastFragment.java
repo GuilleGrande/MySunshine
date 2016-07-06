@@ -1,6 +1,5 @@
 package com.example.guillermo.mysunshine;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,10 +13,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.example.guillermo.mysunshine.data.WeatherContract;
+import com.example.guillermo.mysunshine.sync.MySunshineSyncAdapter;
 
 /**
  * Created by Guillermo on 11-Feb-16.
@@ -181,13 +180,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     /**
-     * Method used to update weather date by calling {@link FetchWeatherTask}
+     * Method used to update weather date by calling {@link MySunshineSyncAdapter}
      */
     public void updateWeather()
     {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utility.getPreferredLocation(getActivity());
-        weatherTask.execute(location);
+        MySunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
