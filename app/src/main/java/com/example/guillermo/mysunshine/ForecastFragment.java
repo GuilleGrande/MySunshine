@@ -1,5 +1,6 @@
 package com.example.guillermo.mysunshine;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +29,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
+    public static final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private static final String SELECTED_KEY = "selected_position";
     private static final int FORECAST_LOADER =  0;
@@ -91,9 +94,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     {
         int id = item.getItemId();
 
-        if (id == R.id.action_refresh)
+        if (id == R.id.action_map)
         {
-            updateWeather();
+            openPreferredLocationInMap();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -237,5 +240,44 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         {
             mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
         }
+    }
+
+    /**
+     * This method fetchs user's preferred location to open
+     * in an external map app
+     */
+    public void openPreferredLocationInMap()
+    {
+        if (null != mForecastAdapter)
+        {
+            Cursor c = mForecastAdapter.getCursor();
+
+            if (null != c)
+            {
+                c.moveToPosition(0);
+                String posLat = c.getString(COL_COORD_LAT);
+                String posLon = c.getString(COL_COORD_LONG);
+                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLon);
+
+                //Build intent to launch external map app
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(geoLocation);
+
+
+                //Resolve intent data to launch app
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null)
+                {
+                    startActivity(intent);
+                }
+                else
+                {
+                    Log.d(LOG_TAG, "Couldn't call " + geoLocation.toString() + ", no receiving apps installed");
+                }
+            }
+
+        }
+
+
+
     }
 }

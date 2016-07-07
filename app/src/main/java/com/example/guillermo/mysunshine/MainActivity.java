@@ -134,46 +134,8 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-        if (id == R.id.action_map)
-        {
-            openPreferredLocationInMap();
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * This method fetchs user's preferred location to open
-     * in an external map app
-     */
-    public void openPreferredLocationInMap()
-    {
-        //Get user's preferred location and store it a String variable
-        String location = Utility.getPreferredLocation(this);
-
-        // Build URI scheme with previous String to launch an intent
-        Uri geoLocation = Uri
-                .parse("geo:0,0?")
-                .buildUpon()
-                .appendQueryParameter("q", location)
-                .build();
-
-        //Build intent to launch external map app
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-
-
-        //Resolve intent data to launch app
-        if (intent.resolveActivity(getPackageManager()) != null)
-        {
-            startActivity(intent);
-        }
-        else
-        {
-            Log.d(LOG_TAG, "Couldn't call " + location + ", no receiving apps installed");
-        }
-
     }
 
     @Override
